@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="sensor_d415">
+  <xacro:macro name="sensor_d415" params="parent *origin name:=camera use_nominal_extrinsics:=false">
+    <xacro:include filename="$(find realsense2_description)/urdf/_d415.urdf.xacro"/>
+    <xacro:include filename="$(find realsense_gazebo)/urdf/_d4.gazebo.xacro"/>
+    <xacro:sensor_d415 parent="${parent}" name="${name}" use_nominal_extrinsics="${use_nominal_extrinsics}">
+      <xacro:insert_block name="origin"/>
+    </xacro:sensor_d415>
+    <xacro:gazebo_d4 name="${name}" color_width="1920" color_height="1080" color_fov="69.4" ired_width="1920" ired_height="1080" ired_fov="69.4" depth_fov="65" rangeMinDepth="0.16" pointCloudCutoff="0.45" pointCloudCutoffMax="4.0"/>
+  </xacro:macro>
+</robot>
+

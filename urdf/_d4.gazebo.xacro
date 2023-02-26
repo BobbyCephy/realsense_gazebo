@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:macro name="gazebo_d4" params="name color_width:=1280 color_height:=800 color_fov:=69.4 ired_width:=1280 ired_height:=800 ired_fov:=91.2 depth_fov:=87 rangeMinDepth:=0.11 rangeMaxDepth:=10 pointCloudCutoff:=0.28 pointCloudCutoffMax:=3.0">
+    <xacro:property name="update_rate" value="30"/>
+    
+    <xacro:macro name="camera" params="suffix type:=camera format:=RGB_INT8 width height fov noise">
+      <sensor name="${name}${suffix}" type="${type}">
+          <camera name="${name}">
+            <horizontal_fov>${pi/180*fov}</horizontal_fov>
+            <image>
+              <width>${width}</width>
+              <height>${height}</height>
+              <format>${format}</format>
+            </image>
+            <noise>
+              <stddev>${noise}</stddev>
+            </noise>
+          </camera>
+          <always_on>1</always_on>
+          <update_rate>${update_rate}</update_rate>
+          <visualize>0</visualize>
+      </sensor>
+    </xacro:macro>
+    
+    <xacro:macro name="ired" params="suffix">
+      <xacro:camera suffix="ired${suffix}" format="L_INT8" width="${ired_width}" height="${ired_height}" fov="${ired_fov}" noise="0.05"/>
+    </xacro:macro>
+    
+    <gazebo reference="${name}_link">
+      <xacro:camera suffix="color" width="${color_width}" height="${color_height}" fov="${color_fov}" noise="0.007"/>
+      <xacro:ired suffix="1"/>
+      <xacro:ired suffix="2"/>
+      <xacro:camera suffix="depth" width="1280" height="720" type="depth" fov="${depth_fov}" noise="0.1"/>
+    </gazebo>
+    
+    <gazebo>
+      <plugin name="${name}" filename="librealsense_gazebo_plugin.so">
+        <prefix>${name}</prefix>
+        <depthUpdateRate>${update_rate}</depthUpdateRate>
+        <colorUpdateRate>${update_rate}</colorUpdateRate>
+        <infraredUpdateRate>${update_rate}</infraredUpdateRate>
+        <depthTopicName>depth/image_raw</depthTopicName>
+        <depthCameraInfoTopicName>depth/camera_info</depthCameraInfoTopicName>
+        <colorTopicName>color/image_raw</colorTopicName>
+        <colorCameraInfoTopicName>color/camera_info</colorCameraInfoTopicName>
+        <infrared1TopicName>infra1/image_raw</infrared1TopicName>
+        <infrared1CameraInfoTopicName>infra1/camera_info</infrared1CameraInfoTopicName>
+        <infrared2TopicName>infra2/image_raw</infrared2TopicName>
+        <infrared2CameraInfoTopicName>infra2/camera_info</infrared2CameraInfoTopicName>
+        <colorOpticalframeName>${name}_color_optical_frame</colorOpticalframeName>
+        <depthOpticalframeName>${name}_depth_optical_frame</depthOpticalframeName>
+        <infrared1OpticalframeName>${name}_infra1_ir_optical_frame</infrared1OpticalframeName>
+        <infrared2OpticalframeName>${name}_infra2_ir_optical_frame</infrared2OpticalframeName>
+        <rangeMinDepth>${rangeMinDepth}</rangeMinDepth>
+        <rangeMaxDepth>${rangeMaxDepth}</rangeMaxDepth>
+        <pointCloud>true</pointCloud>
+        <pointCloudTopicName>depth/color/points</pointCloudTopicName>
+        <pointCloudCutoff>${pointCloudCutoff}</pointCloudCutoff>
+        <pointCloudCutoffMax>${pointCloudCutoffMax}</pointCloudCutoffMax>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+</robot>
+
